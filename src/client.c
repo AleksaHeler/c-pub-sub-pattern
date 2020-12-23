@@ -16,10 +16,10 @@
     ********************************************************************
 */
 
-#include<stdio.h>      //printf
-#include<string.h>     //strlen
-#include<sys/socket.h> //socket
-#include<arpa/inet.h>  //inet_addr
+#include <stdio.h>      //printf
+#include <string.h>     //strlen
+#include <sys/socket.h> //socket
+#include <arpa/inet.h>  //inet_addr
 #include <fcntl.h>     //for open
 #include <unistd.h>    //for close
 
