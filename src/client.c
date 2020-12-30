@@ -16,62 +16,27 @@
     ********************************************************************
 */
 
-#include<stdio.h>      //printf
-#include<string.h>     //strlen
-#include<sys/socket.h> //socket
-#include<arpa/inet.h>  //inet_addr
-#include <fcntl.h>     //for open
-#include <unistd.h>    //for close
+#include <stdio.h>      //printf
+#include <string.h>     //strlen
+#include <sys/socket.h> //socket
+#include <arpa/inet.h>  //inet_addr
+#include <fcntl.h>      //for open
+#include <unistd.h>     //for close
 
-#include<stdlib.h>
-#include<pthread.h>
-#include<string.h>
-#include<semaphore.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <string.h>
+#include <semaphore.h>
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT   27015
 
-int sock;
-struct sockaddr_in server;
-
-void* Receiver()
-{
-    return 0;
-}
-
-void* Sender()
-{
-    //Send some data
-    /*
-    if( send(sock , message , strlen(message), 0) < 0)
-    {
-        puts("Send failed");
-        return 1;
-    }
-    puts("Client message:");
-    puts(message);
-    */
-
-    return 0;
-}
-
-/*
-kada se unese nesto sa tastature treba da se pozove ova funkcija 
-koja prekida niti i zavrsava program
-*/
-void ThreadDestroyer() 
-{
-    close(sock);
-}
-
-void ErrorMessage(char* message, int errorCode)
-{
-    printf("Error: %s\n", message);
-    exit(errorCode);
-}
-
 int main(int argc , char *argv[])
 {
+    int sock;
+    struct sockaddr_in server;
+    char *message = "this is a test";
+
     //Create socket
     sock = socket(AF_INET , SOCK_STREAM , 0);
     if (sock == -1)
@@ -93,7 +58,17 @@ int main(int argc , char *argv[])
 
     puts("Connected\n");
 
-    //Thread init
+    //Send some data
+    if( send(sock , message , strlen(message), 0) < 0)
+    {
+        puts("Send failed");
+        return 1;
+    }
+
+    puts("Client message:");
+    puts(message);
+
+    close(sock);
 
     return 0;
 }
