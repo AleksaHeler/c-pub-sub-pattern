@@ -19,7 +19,7 @@ except:
     sys.exit(2)
 
 url = 'http://api.airvisual.com/v2/city?city={}&state={}&country={}&key={}' #api from https://www.iqair.com/
-api_key = '6a6a1443-6c36-4c58-be0a-219cfa5ded4a'
+api_key = 'YOUR API'
 
 def getPollution(city, state, country):
     result = requests.get(url.format(city, state, country, api_key))

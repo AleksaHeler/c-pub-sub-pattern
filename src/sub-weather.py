@@ -19,7 +19,7 @@ except:
     sys.exit(2)
 
 url = 'http://api.openweathermap.org/data/2.5/weather?q={}&appid={}' #api from https://openweathermap.org/api
-api_key = '1237f282601e312591682e2eb176c058'
+api_key = 'YOUR API'
 
 def getWeather(city):
     result = requests.get(url.format(city, api_key))
