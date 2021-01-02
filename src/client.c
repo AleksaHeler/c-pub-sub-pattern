@@ -39,10 +39,6 @@ pthread_t hReceiver;
 int sock;
 struct sockaddr_in server;
 
-/*
-kada se unese nesto sa tastature treba da se pozove ova funkcija 
-koja prekida niti i zavrsava program
-*/
 void ThreadDestroyer() 
 {
     pthread_cancel(hSender);
@@ -54,11 +50,6 @@ void ErrorMessage(char* message)
 {
     printf("Error: %s\n", message);
 }
-
-//thread schedule
-//ima onaj getc sa sppurva i kad se unese m ponovo treba da se izvrsava sender
-//schedule treba da proverava da li je promenljiva na 0 i ako je pritisnut m treba da je postavi na 1
-//promenljiva je na pocetku na 1
 
 void* Receiver()
 {
