@@ -3,10 +3,7 @@ import sys
 import requests
 import time
 
-url = 'http://api.openweathermap.org/data/2.5/weather?q={}&appid={}' #api from https://openweathermap.org/api
-
-api_key = 'your_api'
-
+#socket creation and connection
 try:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("Socket created")
@@ -21,6 +18,9 @@ except:
     print("Can't connect to the server")
     sys.exit(2)
 
+url = 'http://api.openweathermap.org/data/2.5/weather?q={}&appid={}' #api from https://openweathermap.org/api
+api_key = '1237f282601e312591682e2eb176c058'
+
 def getWeather(city):
     result = requests.get(url.format(city, api_key))
     if result:
@@ -34,8 +34,8 @@ def getWeather(city):
         humidity = json['main']['humidity']
 
         ret_val = str(city) + ' ' + str(country) + ' ' + str( round(temp_celsius,2) ) + ' ' + str(weather) + ' '
-        ret_val += str(description) + ' ' + str(pressure) + ' ' + str(humidity)
-        
+        ret_val += str(description) + ' ' + str(pressure) + ' ' + str(humidity) + 'w'
+
         return ret_val  
     else:
         return 0
