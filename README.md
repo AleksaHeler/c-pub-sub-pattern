@@ -7,3 +7,5 @@ Realizacija jednostavnog modela poslužioca publish-subscribe asocijacija korist
 Primer: korisnik 1 se povezuje sa poslužiocem i traži prijem događaja o vremenskoj prognozi (subscriber 1). Korisnik 2 se povezuje sa poslužiocem i traži prijem događaja o rezultatima fudbalskih utakmica (subscriber 2). Sa poslužiocem se povezuje i nekoliko korisnika koji šalju događaje o raznim temama (publishers). Prikazati kako poslužilac filtrira i objavljuje tražene događaje prijavljenim korisnicima.
 
 ## TODO: zapisati strukturu programa ovde
+
+## TODO: zapisati kako se koristi program
