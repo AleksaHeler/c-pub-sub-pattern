@@ -12,7 +12,7 @@ LDIR =../lib
 
 # Define any libraries to link into executable (the math library -lm)
 # Use the -llibname option (this will link in libm.so)
-LIBS=-lm
+LIBS=-lm -pthread
 
 _DEPS = #client.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
