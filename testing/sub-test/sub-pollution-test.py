@@ -3,21 +3,6 @@ import sys
 import requests
 import time
 
-#socket creation and connection
-try:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print("Socket created")
-except:
-    print("Can't create socket")
-    sys.exit(1)
-
-try:
-    sock.connect( ("127.0.0.1", 27015) )
-    print("Connection the the server established")
-except:
-    print("Can't connect to the server")
-    sys.exit(2)
-
 url = 'http://api.airvisual.com/v2/city?city={}&state={}&country={}&key={}' #api from https://www.iqair.com/
 api_key = 'YOUR API'
 
@@ -48,7 +33,28 @@ def getPollution(city, state, country):
     else:
         return 0
 
-while(1):
+#socket creation and connection
+try:
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    print("Socket created")
+except:
+    print("Can't create socket")
+    sys.exit(1)
+
+try:
+    sock.bind(('127.0.0.1', 27015))
+    print("Server created")
+except:
+    print("Can't create server")
+    sys.exit(2)
+
+sock.listen(1)
+print('Listening for 1 connection')
+
+print('Waiting for connection\n')
+clientSock, addr = sock.accept()
+
+for i in range(3):
     cities = [getPollution('Novi Sad', 'Autonomna Pokrajina Vojvodina', 'Serbia'), 
             getPollution('Belgrade', 'Central Serbia', 'Serbia'),
             getPollution('Kragujevac', 'Central Serbia', 'Serbia'),
@@ -59,13 +65,18 @@ while(1):
             print('Failed to get information about city')
             continue
 
-        time.sleep(2) #2 seconds
-        try:
-            ret_val = sock.send(city.encode())
-            print('Message sent: ' + city)
-        except:
-            print("Error sending message")
-            sys.exit(3)
+        data = clientSock.recv(512)
 
+        print('Expected: ' + city)
+        print('Actual:   ' + data.decode())
+
+        if(city != data.decode()):
+            print('ERROR')
+            sys.exit(3)
+        else:
+            print('OK\n')
+        
     time.sleep(6) #6 seconds
-    print()
+    print('----------------------------')
+
+print('ALL TESTS PASSED SUCCESSFULLY')

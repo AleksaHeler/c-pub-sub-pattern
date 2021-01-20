@@ -29,14 +29,20 @@ except:
     sys.exit(1)
 
 try:
-    sock.connect( ("127.0.0.1", 27015) )
-    print("Connection the the server established")
+    sock.bind(('127.0.0.1', 27015))
+    print("Server created")
 except:
-    print("Can't connect to the server")
+    print("Can't create server")
     sys.exit(2)
 
+sock.listen(1)
+print('Listening for 1 connection')
 
-while(1):
+print('Waiting for connection\n')
+clientSock, addr = sock.accept()
+
+
+for x in range(3):
     try:
         response = session.get(url, params=parameters)
         json = response.json()
@@ -60,12 +66,15 @@ while(1):
         ret_val += str(i + 1) + '. ' + str(symbol) + '(' + str(name) + ') USD: ' + str( round(price, 2) ) + '\n'
 
     ret_val += '"'
-    #send data to server
-    try:
-        result = sock.send(ret_val.encode())
-        print('Message sent:\n' + ret_val)
-    except:
-        print("Error sending message")
+    
+
+    data = clientSock.recv(512)
+    if(ret_val != data.decode()):
+        print('ERROR')
         sys.exit(4)
+    else:
+        print('OK ' + str(x))
 
     time.sleep(10) #10 seconds
+
+print('ALL TESTS PASSED SUCCESSFULLY')

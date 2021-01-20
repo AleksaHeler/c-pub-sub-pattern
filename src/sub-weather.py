@@ -33,7 +33,7 @@ def getWeather(city):
         pressure = json['main']['pressure']
         humidity = json['main']['humidity']
 
-        ret_val = 'pub -t "weather" -m "' + str(city) + ' ' + str(country) + ' ' + str( round(temp_celsius,2) ) + ' ' + str(weather) + ' '
+        ret_val = 'pub -t "weather/'+ city.lower().replace(' ', '') + '" -m "' + str(city) + ' ' + str(country) + ' ' + str( round(temp_celsius,2) ) + ' ' + str(weather) + ' '
         ret_val += str(description) + ' ' + str(pressure) + ' ' + str(humidity) + '"'
 
         return ret_val  
@@ -41,7 +41,7 @@ def getWeather(city):
         return 0
 
 while(1):
-    cities = [getWeather('Belgrade'), getWeather('Novi Sad'), getWeather('Kragujevac'), getWeather('Niš')]
+    cities = [getWeather('Belgrade'), getWeather('Novi Sad'), getWeather('Kragujevac'), getWeather('Nis')]
 
     for city in cities:
         time.sleep(2) #2 seconds
