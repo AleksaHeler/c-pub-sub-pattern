@@ -170,17 +170,17 @@ void* ClientHandlerThread(void *new_sock){
                 if(clients[i].socket == sock){ // If it is the one that sent this request
                     printf("Found the client that sent unsub request! (socket %d)\n", clients[i].socket);
                     int subscribed = 0;
-                    for(i = 0; i < MAX_TOPICS; i++){ // Check if already subscribed
-                        if(strcmp(clients[i].topics[i], tokens[2]) == 0){
+                    for(j = 0; j < MAX_TOPICS; j++){ // Check if already subscribed
+                        if(strcmp(clients[i].topics[j], tokens[2]) == 0){
                             subscribed = 1;
                             break;
                         }
                     }
                     if(subscribed == 1){ // If subscribed
-                        for(i = 0; i < MAX_TOPICS; i++){ // Find the topic and empty it
-                            if(strcmp(clients[i].topics[i], tokens[2]) == 0){
+                        for(j = 0; j < MAX_TOPICS; j++){ // Find the topic and empty it
+                            if(strcmp(clients[i].topics[j], tokens[2]) == 0){
                                 printf("Unsubscribed! (topic %s)\n\n", tokens[2]);
-                                clients[i].topics[i][0] = '\0';
+                                clients[i].topics[j][0] = '\0';
                                 break;
                             }
                         }
