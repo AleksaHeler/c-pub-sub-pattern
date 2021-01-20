@@ -34,8 +34,8 @@
 
 #define DEFAULT_BUFLEN  512
 #define DEFAULT_PORT    27015
-#define MAX_CLIENTS     10
-#define MAX_TOPICS      10
+#define MAX_CLIENTS     50
+#define MAX_TOPICS      50
 
 struct client {
     int socket;
@@ -48,7 +48,7 @@ void* client_handler_thread(void *);
 int main(int argc , char *argv[])
 {
     int socket_desc , client_sock , c, i;
-    struct sockaddr_in server , client_sockadd_in;
+    struct sockaddr_in server, cli_sockaddr_in;
     int *new_sock;
    
     //Create socket
@@ -78,7 +78,7 @@ int main(int argc , char *argv[])
 
     while(1){
         //accept connection from an incoming client
-        client_sock = accept(socket_desc, (struct sockaddr *)&client_sockadd_in, (socklen_t*)&c);
+        client_sock = accept(socket_desc, (struct sockaddr *)&cli_sockaddr_in, (socklen_t*)&c);
         if (client_sock < 0) {
             perror("[Error] Accept failed!");
             return 1;
@@ -87,7 +87,7 @@ int main(int argc , char *argv[])
 
         // Create thread vars, and prepare parameter
         pthread_t sub;
-        new_sock = malloc(1);
+        new_sock = (int*)malloc(sizeof(int));
         *new_sock = client_sock;
         
         // Try to find the client
@@ -110,6 +110,8 @@ int main(int argc , char *argv[])
                 }
             }
         }
+        printf("clients[i].socket = %d\n", clients[i].socket);
+        printf("*new_sock = %d\n", *new_sock);
 
         if(pthread_create(&sub, NULL, client_handler_thread, (void *)new_sock) < 0){
             perror("[Error] Thread create failed!");
@@ -123,17 +125,20 @@ void* client_handler_thread(void *new_sock){
     int sock = *(int*)new_sock;
     int read_size, i, j;
     char *token, *state;
-    char tokens[10][DEFAULT_BUFLEN];
+    char tokens[100][DEFAULT_BUFLEN];
     char msg[DEFAULT_BUFLEN];
+    printf("new_sock = %d\n", *(int*)new_sock);
+    printf("sock = %d\n", sock);
 
     // Receive logika
     while( (read_size = recv(sock , msg , DEFAULT_BUFLEN , 0)) > 0 ){
         msg[read_size] = '\0';
 
         // Extract individual tokens from the message
+        // pub -t "weather" -m "22C"
         i = 0;
         for (token = strtok_r(msg, " ", &state); token != NULL; token = strtok_r(NULL, " ", &state)) {
-            printf("tokens[%d]: %s\n", i, token);
+            //printf("tokens[%d]: %s\n", i, token);
             strcpy(tokens[i++], token);
             if(strcmp(tokens[i-1], "-m") == 0){
                 strcpy(tokens[i++], state);
@@ -202,11 +207,16 @@ void* client_handler_thread(void *new_sock){
             printf("Topic: %s, Message: %s\n", tokens[2], tokens[4]);
 
             for (i = 0; i < MAX_CLIENTS; i++){ // Go trough clients
-                if(clients[i].socket =! 0){ // If the client exists
+                if(clients[i].socket != 0){ // If the client exists
                     for(j = 0; j < MAX_TOPICS; j++){ // Go trough all its topics
                         if(strcmp(clients[i].topics[j], tokens[2]) == 0){ // If it is subscribed
                             printf("Found a client subscribed to topic %s! (socket %d)\n", tokens[2], clients[i].socket);
-                            /// TODO: SEND CLIENT A MESSAGE
+                            
+                            if(send(clients[i].socket, tokens[4], strlen(tokens[4]), 0) < 0){
+                                puts("[Error] Send failed\n\n");
+                            }else{
+                                printf("Message sent to client %s! (socket %d)\n", tokens[4], clients[i].socket);
+                            }
                             break; // We can break, because client can be subscribed to a topic only once
                         }
                     }

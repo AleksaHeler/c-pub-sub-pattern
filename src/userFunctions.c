@@ -77,7 +77,7 @@ void inputCityToString(int input, char* dst)
     switch(input)
     {
         case 1:
-            sprintf(dst, "%s", "novi sad\"");
+            sprintf(dst, "%s", "novisad\"");
             break;
 
         case 2:
