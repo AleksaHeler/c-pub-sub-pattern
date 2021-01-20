@@ -16,12 +16,6 @@
     ********************************************************************
 */
 
-/*
- * TODO: proveriti da li je struktura ok, tj da li je sve sto je potrebno tu
- * 
- * 
-*/
-
 #include <stdio.h>
 #include <string.h>     //strlen
 #include <sys/socket.h>
@@ -134,7 +128,6 @@ void* ClientHandlerThread(void *new_sock){
         // pub -t "weather" -m "22C"
         i = 0;
         for (token = strtok_r(msg, " ", &state); token != NULL; token = strtok_r(NULL, " ", &state)) {
-            //printf("tokens[%d]: %s\n", i, token);
             strcpy(tokens[i++], token);
             if(strcmp(tokens[i-1], "-m") == 0){
                 strcpy(tokens[i++], state);
