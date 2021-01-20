@@ -23,7 +23,7 @@ url = 'https://api.whatdoestrumpthink.com/api/v1/quotes/random'
 #sending data
 while(1):
     try:
-        result = requests.get(url.format()).json()['message'] + 't'
+        result = 'pub -t "trump"\n' + requests.get(url.format()).json()['message']
         ret_val = sock.send(result.encode())
         print('Message sent: ' + result)
     except:

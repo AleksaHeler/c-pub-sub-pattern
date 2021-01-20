@@ -29,7 +29,7 @@ def getPollution(city, state, country):
         city = json['data']['city']
         aqi = json['data']['current']['pollution']['aqius']
 
-        ret_val = str(country) + ': ' + str(city) + ' Index: ' + str(aqi) + ' '
+        ret_val = 'pub -t "pollution"\n' + str(country) + ': ' + str(city) + ' Index: ' + str(aqi) + ' '
         if(aqi <= 50):
             ret_val += 'Good'
         elif(aqi <= 100):
@@ -43,7 +43,6 @@ def getPollution(city, state, country):
         elif(aqi <= 500):
             ret_val += 'Hazardous'
 
-        ret_val += 'p'
         return ret_val
     else:
         return 0

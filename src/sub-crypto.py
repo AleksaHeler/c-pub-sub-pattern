@@ -48,7 +48,9 @@ while(1):
     symbol = json['data'][0]['symbol']
     price = json['data'][0]['quote']['USD']['price']
           
-    ret_val = str(1) + '. ' + str(symbol) + '(' + str(name) + ') USD: ' + str( round(price, 2) ) + '\n'
+
+    ret_val = 'pub -t "crypto"\n'
+    ret_val += str(1) + '. ' + str(symbol) + '(' + str(name) + ') USD: ' + str( round(price, 4) ) + '\n'
   
     for i in range(1,5):
         name = json['data'][i]['name']
@@ -56,8 +58,6 @@ while(1):
         price = json['data'][i]['quote']['USD']['price']
           
         ret_val += str(i + 1) + '. ' + str(symbol) + '(' + str(name) + ') USD: ' + str( round(price, 2) ) + '\n'
-
-    ret_val += 'c'
 
     #send data to server
     try:
