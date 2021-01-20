@@ -35,18 +35,19 @@
 #define DEFAULT_BUFLEN  512
 #define DEFAULT_PORT    27015
 #define MAX_CLIENTS     10
+#define MAX_TOPICS      10
 
 struct client {
-    int socket_desc;
-    struct sockaddr_in socket;
-    char topics[50][DEFAULT_BUFLEN]; // max 50 topica
+    int socket;
+    char topics[MAX_TOPICS][DEFAULT_BUFLEN];
 };
+struct client clients[MAX_CLIENTS];
 
 void* client_handler_thread(void *);
 
 int main(int argc , char *argv[])
 {
-    int socket_desc , client_sock , c;
+    int socket_desc , client_sock , c, i;
     struct sockaddr_in server , client_sockadd_in;
     int *new_sock;
    
@@ -89,6 +90,27 @@ int main(int argc , char *argv[])
         new_sock = malloc(1);
         *new_sock = client_sock;
         
+        // Try to find the client
+        int new_client = 1;
+        for (i = 0; i < MAX_CLIENTS; i++){
+            if(clients[i].socket == client_sock){
+                new_client = 0;
+                printf("Client found (socket %d)\n\n", client_sock);
+                break;
+            }
+        }
+
+        // If no client found then create one
+        if(new_client == 1){
+            for (i = 0; i < MAX_CLIENTS; i++){
+                if(clients[i].socket == 0){
+                    clients[i].socket = client_sock;
+                    printf("Created client (socket %d)\n\n", client_sock);
+                    break;
+                }
+            }
+        }
+
         if(pthread_create(&sub, NULL, client_handler_thread, (void *)new_sock) < 0){
             perror("[Error] Thread create failed!");
         }
@@ -99,34 +121,97 @@ int main(int argc , char *argv[])
 
 void* client_handler_thread(void *new_sock){
     int sock = *(int*)new_sock;
-    int read_size, i;
+    int read_size, i, j;
     char *token, *state;
-    char tokens[5][DEFAULT_BUFLEN];
+    char tokens[10][DEFAULT_BUFLEN];
     char msg[DEFAULT_BUFLEN];
 
     // Receive logika
     while( (read_size = recv(sock , msg , DEFAULT_BUFLEN , 0)) > 0 ){
         msg[read_size] = '\0';
-        //printf("Bytes received: %d\n", read_size);
 
         // Extract individual tokens from the message
         i = 0;
         for (token = strtok_r(msg, " ", &state); token != NULL; token = strtok_r(NULL, " ", &state)) {
-            //printf("Token: %s\n", token);
+            printf("tokens[%d]: %s\n", i, token);
             strcpy(tokens[i++], token);
+            if(strcmp(tokens[i-1], "-m") == 0){
+                strcpy(tokens[i++], state);
+            }
         }
 
         // Check what kind of request is it
         if(strcmp(tokens[0], "sub") == 0){ // SUBSCRIBE
-            // Go trough all clients and compare socket info
-            // When client is found, look if it is not already subscribed, then add topic
+            printf("-SUBSCRIBE-\n");
             printf("Topic: %s\n", tokens[2]);
+
+            for (i = 0; i < MAX_CLIENTS; i++){ // Go trough clients
+                if(clients[i].socket == sock){ // If it is the one that sent this request
+                    printf("Found the client that sent sub request! (socket %d)\n", clients[i].socket);
+                    int subscribed = 0;
+                    for(j = 0; j < MAX_TOPICS; j++){ // Check if already subscribed
+                        if(strcmp(clients[i].topics[j], tokens[2]) == 0){
+                            printf("Client already subscribed! (topic %s)\n\n", tokens[2]);
+                            subscribed = 1;
+                            break;
+                        }
+                    }
+                    if(subscribed == 0){ // If not subscribed
+                        for(j = 0; j < MAX_TOPICS; j++){ // Find an empty string and set it
+                            if(!(clients[i].topics[j] && clients[i].topics[j][0])){ // Is it empty?
+                                printf("Subscribed! (topic %s)\n\n", tokens[2]);
+                                strcpy(clients[i].topics[j], tokens[2]);
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
         } else if(strcmp(tokens[0], "unsub") == 0){ // UNSUBSCRIBE
-            // Go trough all clients and compare socket info, if it is equal, find and remove topic
+            printf("-UNSUBSCRIBE-\n");
             printf("Topic: %s\n", tokens[2]);
+
+            for (i = 0; i < MAX_CLIENTS; i++){ // Go trough clients
+                if(clients[i].socket == sock){ // If it is the one that sent this request
+                    printf("Found the client that sent unsub request! (socket %d)\n", clients[i].socket);
+                    int subscribed = 0;
+                    for(i = 0; i < MAX_TOPICS; i++){ // Check if already subscribed
+                        if(strcmp(clients[i].topics[i], tokens[2]) == 0){
+                            subscribed = 1;
+                            break;
+                        }
+                    }
+                    if(subscribed == 1){ // If subscribed
+                        for(i = 0; i < MAX_TOPICS; i++){ // Find the topic and empty it
+                            if(strcmp(clients[i].topics[i], tokens[2]) == 0){
+                                printf("Unsubscribed! (topic %s)\n\n", tokens[2]);
+                                clients[i].topics[i][0] = '\0';
+                                break;
+                            }
+                        }
+                    } else{
+                        printf("Client was not even subscribed! (topic %s)\n\n", tokens[2]);
+                    }
+                    break;
+                }
+            }
         } else if(strcmp(tokens[0], "pub") == 0){ // PUBLISH
             // Go trough all clients and compare topics, if it is equal, send them message
+            printf("-PUBLISH-\n");
             printf("Topic: %s, Message: %s\n", tokens[2], tokens[4]);
+
+            for (i = 0; i < MAX_CLIENTS; i++){ // Go trough clients
+                if(clients[i].socket =! 0){ // If the client exists
+                    for(j = 0; j < MAX_TOPICS; j++){ // Go trough all its topics
+                        if(strcmp(clients[i].topics[j], tokens[2]) == 0){ // If it is subscribed
+                            printf("Found a client subscribed to topic %s! (socket %d)\n", tokens[2], clients[i].socket);
+                            /// TODO: SEND CLIENT A MESSAGE
+                            break; // We can break, because client can be subscribed to a topic only once
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -134,8 +219,9 @@ void* client_handler_thread(void *new_sock){
         puts("Client disconnected");
         fflush(stdout);
     }
-    else if(read_size == -1)
+    else if(read_size == -1){
         perror("[Error] Recv failed");
+    }
 
     free(new_sock);
     return 0;
