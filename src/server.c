@@ -43,7 +43,7 @@ struct client {
 };
 struct client clients[MAX_CLIENTS];
 
-void* client_handler_thread(void *);
+void* ClientHandlerThread(void *);
 
 int main(int argc , char *argv[])
 {
@@ -110,10 +110,8 @@ int main(int argc , char *argv[])
                 }
             }
         }
-        printf("clients[i].socket = %d\n", clients[i].socket);
-        printf("*new_sock = %d\n", *new_sock);
 
-        if(pthread_create(&sub, NULL, client_handler_thread, (void *)new_sock) < 0){
+        if(pthread_create(&sub, NULL, ClientHandlerThread, (void *)new_sock) < 0){
             perror("[Error] Thread create failed!");
         }
     }
@@ -121,14 +119,12 @@ int main(int argc , char *argv[])
     return 0;
 }
 
-void* client_handler_thread(void *new_sock){
+void* ClientHandlerThread(void *new_sock){
     int sock = *(int*)new_sock;
     int read_size, i, j;
     char *token, *state;
     char tokens[100][DEFAULT_BUFLEN];
     char msg[DEFAULT_BUFLEN];
-    printf("new_sock = %d\n", *(int*)new_sock);
-    printf("sock = %d\n", sock);
 
     // Receive logika
     while( (read_size = recv(sock , msg , DEFAULT_BUFLEN , 0)) > 0 ){
