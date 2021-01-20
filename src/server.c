@@ -39,13 +39,10 @@
 struct client {
     int socket_desc;
     struct sockaddr_in socket;
-    char topics[50][100]; // max 50 topica sa po 100 karaktera za svaki
+    char topics[50][DEFAULT_BUFLEN]; // max 50 topica
 };
 
-// Funkcije za akcije koje klijent ima (za pthread)
-void* pub_thread(void *);
-void* sub_thread(void *);
-void* unsub_thread(void *);
+void* client_handler_thread(void *);
 
 int main(int argc , char *argv[])
 {
@@ -92,7 +89,7 @@ int main(int argc , char *argv[])
         new_sock = malloc(1);
         *new_sock = client_sock;
         
-        if(pthread_create(&sub, NULL, sub_thread, (void *)new_sock) < 0){
+        if(pthread_create(&sub, NULL, client_handler_thread, (void *)new_sock) < 0){
             perror("[Error] Thread create failed!");
         }
     }
@@ -100,15 +97,37 @@ int main(int argc , char *argv[])
     return 0;
 }
 
-void* sub_thread(void *new_sock){
+void* client_handler_thread(void *new_sock){
     int sock = *(int*)new_sock;
-    int read_size;
-    char client_message[DEFAULT_BUFLEN];
+    int read_size, i;
+    char *token, *state;
+    char tokens[5][DEFAULT_BUFLEN];
+    char msg[DEFAULT_BUFLEN];
 
     // Receive logika
-    while( (read_size = recv(sock , client_message , DEFAULT_BUFLEN , 0)) > 0 ){
-        printf("Bytes received: %d\n", read_size);
-        printf("Message received: %s\n", client_message);
+    while( (read_size = recv(sock , msg , DEFAULT_BUFLEN , 0)) > 0 ){
+        msg[read_size] = '\0';
+        //printf("Bytes received: %d\n", read_size);
+
+        // Extract individual tokens from the message
+        i = 0;
+        for (token = strtok_r(msg, " ", &state); token != NULL; token = strtok_r(NULL, " ", &state)) {
+            //printf("Token: %s\n", token);
+            strcpy(tokens[i++], token);
+        }
+
+        // Check what kind of request is it
+        if(strcmp(tokens[0], "sub") == 0){ // SUBSCRIBE
+            // Go trough all clients and compare socket info
+            // When client is found, look if it is not already subscribed, then add topic
+            printf("Topic: %s\n", tokens[2]);
+        } else if(strcmp(tokens[0], "unsub") == 0){ // UNSUBSCRIBE
+            // Go trough all clients and compare socket info, if it is equal, find and remove topic
+            printf("Topic: %s\n", tokens[2]);
+        } else if(strcmp(tokens[0], "pub") == 0){ // PUBLISH
+            // Go trough all clients and compare topics, if it is equal, send them message
+            printf("Topic: %s, Message: %s\n", tokens[2], tokens[4]);
+        }
     }
 
     if(read_size == 0) {
@@ -117,10 +136,6 @@ void* sub_thread(void *new_sock){
     }
     else if(read_size == -1)
         perror("[Error] Recv failed");
-
-    // Proveriti da li je format ispravan
-    // [sub -t "weather"]
-
 
     free(new_sock);
     return 0;
