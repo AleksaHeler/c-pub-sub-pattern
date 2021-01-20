@@ -23,7 +23,7 @@ url = 'http://numbersapi.com/random/year?json' #api from http://numbersapi.com/#
 #sending data
 while(1): 
     try:
-        result = 'pub -t "years"\n' + requests.get(url.format()).json()['text']
+        result = 'pub -t "years" -m "' + requests.get(url.format()).json()['text'] + '"'
         ret_val = sock.send(result.encode())
         print('Message sent: ' + result)
     except:

@@ -1,52 +1,151 @@
-void meni()
+#include "userFunctions.h"
+
+int meni()  
 {
     printf("Meni:\n");
+    printf("0. Exit\n");
+    printf("1. Subscribe\n");
+    printf("2. Unsubscribe\n");
+    printf("3. Publish\n");
+    printf("Your option:\n");
 
-    //printf("0. Continue recieving messages\n\n");
+    int selected;
+    while(1)
+    {
+        scanf("%d", &selected);
 
-    printf("1. Subscribe to weather\n");
-    printf("11. Unsubscribe to weather\n\n");
+        if(selected<0 || selected>3)
+            printf("Option must be in range [0,3]\nYour option:\n");
+        else
+            break;
+    }
 
-    printf("2. Subscribe to pollution\n");
-    printf("22. Unsubscribe to pollution\n\n");
-
-    printf("3. Subscribe to years\n");
-    printf("33. Unsubscribe to years\n\n");
-
-    printf("4. Subscribe to numbers\n");
-    printf("44. Unsbscribe to numbers\n\n");
-
-    printf("5. Subscribe to trump\n");
-    printf("55. Unsubscribe to trump\n\n");
-
-    printf("6. Subscribe to crypto market cap\n");
-    printf("66. Unsubscribe to crypto market cap\n\n");
-
-    printf("100. Exit\n\n");
+    return selected;
 }
 
-int checkInputMeni(int input)
+int meniCity()
 {
-    if(input == 100)
-        return 1;
-    else if(input<1 || (input>6 && input<11) || (input>11 && input<22) || (input>22 && input<33) ||
-           (input>33 && input<44) || (input>44 && input<55) || (input>55 && input<66) || input>66)
-        return 0;
-
-    return 1;
-}
-
-void cityMeni()
-{
-    puts("City you want to be subscribed to:");
+    puts("City you want to sub/unsub:");
+    puts("0. Exit");
     puts("1. Novi Sad");
     puts("2. Belgrade");
     puts("3. Kragujevac");
     puts("4. Nis");
-    printf("Your option: ");
+
+    int selected;
+    while(1)
+    {
+        printf("Choose city:\n");
+        scanf("%d", &selected);
+
+        if(selected<0 || selected>4)
+            printf("Option must be in range [0,4]\n");
+        else
+            break;
+    }
+
+    return selected;
 }
 
-int checkInputCityMeni(int input)
+int meniTopic()
 {
-    return input>=1 && input<=4;
+    printf("0. Exit\n");
+    printf("1. Crypto\n");
+    printf("2. Numbers\n");
+    printf("3. Pollution\n");
+    printf("4. Trump\n");
+    printf("5. Weather\n");
+    printf("6. Years\n");
+
+    int selected;
+    while(1)
+    {
+        printf("Choose topic:\n");
+        scanf("%d", &selected);
+
+        if(selected<0 || selected>6)
+            printf("Option must be in range [0,6]\n");
+        else
+            break;
+    }
+
+    return selected;
+}
+
+void inputCityToString(int input, char* dst)
+{
+    switch(input)
+    {
+        case 1:
+            sprintf(dst, "%s", "novi sad\"");
+            break;
+
+        case 2:
+            sprintf(dst, "%s", "brelgrade\"");
+            break;
+
+        case 3:
+            sprintf(dst, "%s", "kragujevac\"");
+            break;
+
+        case 4:
+            sprintf(dst, "%s", "nis\"");
+            break;
+
+        default:
+            printf("INVALID CITY INPUT\n");
+            exit(1);
+    }
+}
+
+void inputToString(int input, char* dst)
+{
+    switch(input)
+    {
+        case 1:
+            sprintf(dst, "%s", "sub -t ");
+            break;
+        
+        case 2:
+            sprintf(dst, "%s", "unsub -t ");
+            break;
+
+        default:
+            printf("INVALID INPUT\n");
+            exit(1);
+    }
+}
+
+void inputTopicToString(int input, char* dst)
+{
+    switch(input)
+    {
+        case 1:
+            sprintf(dst, "%s", "\"crypto\"");
+            break;
+
+        case 2:
+            sprintf(dst, "%s", "\"numbers\"");
+            break;
+        
+        case 3:
+            sprintf(dst, "%s", "\"pollution/");
+            break;
+
+        case 4:
+            sprintf(dst, "%s", "\"trump\"");
+            break;
+
+        case 5:
+            sprintf(dst, "%s", "\"weather/");
+            break;
+
+        case 6:
+            sprintf(dst, "%s", "\"years\"");
+            break;
+
+        default:
+            printf("INVALID TOPIC INPUT\n");
+            exit(1);
+    }
 }

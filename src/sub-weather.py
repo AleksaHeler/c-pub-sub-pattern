@@ -33,8 +33,8 @@ def getWeather(city):
         pressure = json['main']['pressure']
         humidity = json['main']['humidity']
 
-        ret_val = 'pub -t "weather"\n' + str(city) + ' ' + str(country) + ' ' + str( round(temp_celsius,2) ) + ' ' + str(weather) + ' '
-        ret_val += str(description) + ' ' + str(pressure) + ' ' + str(humidity)
+        ret_val = 'pub -t "weather" -m "' + str(city) + ' ' + str(country) + ' ' + str( round(temp_celsius,2) ) + ' ' + str(weather) + ' '
+        ret_val += str(description) + ' ' + str(pressure) + ' ' + str(humidity) + '"'
 
         return ret_val  
     else:

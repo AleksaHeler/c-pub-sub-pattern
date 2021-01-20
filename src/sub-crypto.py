@@ -49,7 +49,7 @@ while(1):
     price = json['data'][0]['quote']['USD']['price']
           
 
-    ret_val = 'pub -t "crypto"\n'
+    ret_val = 'pub -t "crypto" -m "'
     ret_val += str(1) + '. ' + str(symbol) + '(' + str(name) + ') USD: ' + str( round(price, 4) ) + '\n'
   
     for i in range(1,5):
@@ -59,6 +59,7 @@ while(1):
           
         ret_val += str(i + 1) + '. ' + str(symbol) + '(' + str(name) + ') USD: ' + str( round(price, 2) ) + '\n'
 
+    ret_val += '"'
     #send data to server
     try:
         result = sock.send(ret_val.encode())

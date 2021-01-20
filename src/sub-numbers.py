@@ -23,7 +23,7 @@ url = 'http://numbersapi.com/random?min=0&max=551' #api from http://numbersapi.c
 #sending data
 while(1):
     try:
-        result = 'pub -t "numbers"\n' + requests.get(url.format()).text
+        result = 'pub -t "numbers" -m "' + requests.get(url.format()).text + '"'
         ret_val = sock.send(result.encode())
         print('Message sent: ' + result)
     except:

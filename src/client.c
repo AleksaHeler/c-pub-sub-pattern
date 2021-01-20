@@ -28,7 +28,7 @@
 #include<string.h>
 #include<semaphore.h>
 
-#include"userFunctions.c"
+#include"userFunctions.h"
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT   27015
@@ -41,6 +41,7 @@ struct sockaddr_in server;
 
 void ThreadDestroyer() 
 {
+    printf("Canceling threads...\n");
     pthread_cancel(hSender);
     pthread_cancel(hReceiver);
     close(sock);
@@ -73,66 +74,66 @@ void* Receiver()
 
 void* Sender()
 {
-    char message[4];
-    int input;
+    char message[DEFAULT_BUFLEN];
+    int input1, input2;
+    char str1[DEFAULT_BUFLEN/3 - 1];
+    char str2[DEFAULT_BUFLEN/3 - 1];
+    char str3[DEFAULT_BUFLEN/3 - 1];
+    char ch;
+    int brojac;
+
     while(1)
     {   
-        meni();
-        scanf("%d", &input);
-        
-        if(checkInputMeni(input))
+        input1 = meni(); //exit, sub, unsub, publish
+        printf("\n");
+
+        if(input1 == 0) //exit
+            ThreadDestroyer();
+    
+        if(input1 == 1 || input1 == 2) //sub, unsub
         {
-            if(input == 100)
-            {
+            input2 = meniTopic();
+            printf("\n");
+
+            if(input2 == 0) //exit
                 ThreadDestroyer();
+
+            inputToString(input1, str1);
+            inputTopicToString(input2, str2);
+
+            if(input2 == 3 || input2 == 5) //if city needs to be choosen
+            {
+                input2 = meniCity();
+
+                if(input2 == 0) //exit
+                    ThreadDestroyer();
+
+                inputCityToString(input2, str3);
+
+                sprintf(message, "%s%s%s%c", str1, str2, str3, 0);
             }
-
-            if(input < 7)
-                message[0] = 's'; //subscribe
-            else 
-                message[0] = 'u'; //unsubscribe
-
-            if(input == 1 || input == 11)
-                message[1] = 'w'; //weather
-            else if(input == 2 || input == 22)
-                message[1] = 'p'; //polution
             else
-            {
-                if(input == 3 || input == 33)
-                    message[1] = 'y'; //years
-                else if(input == 4 || input == 44)
-                    message[1] = 'n'; //numbers
-                else if(input == 5 || input == 55)
-                    message[1] = 't'; //Trump
-                else // else if(input == 6 || input == 66)
-                    message[1] = 'c'; //crypto market cap
-            
-                message[2] = '\0';
-            }
-
-            if(input == 1 || input == 11 || input == 2 || input == 22)
-            {
-                while(1)
-                {
-                    cityMeni();
-                    scanf("%d", &input);
-
-                    if(checkInputCityMeni(input) == 1)
-                    {
-                        message[2] = input + 48;
-                        break;
-                    }
-                        else
-                            printf("\nInvalid input\n");
-                }
-
-                message[3] = '\0';
-            }
+                sprintf(message, "%s%s%c", str1, str2, 0);
         }
         else
         {
-            puts("Invalid input");
-            continue;
+            printf("Publish something on your own\n");
+            printf("It should be in the following format: pub -t \"topic_name\" -m \"message\"\n");
+            
+            brojac = 0;
+            ch = 0;
+            getchar(); //clear '\n'
+            while( (ch = getchar()) != '\n')
+            {
+                message[brojac] = ch;
+                if(++brojac == DEFAULT_BUFLEN)
+                {
+                    ErrorMessage("BufferOverflow");
+                    continue;
+                }
+            }
+
+            message[brojac] = '\0';
         }
 
         //Send data
@@ -178,4 +179,3 @@ int main(int argc , char *argv[])
 
     return 0;
 }
-
