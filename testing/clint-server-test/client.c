@@ -84,8 +84,6 @@ void* Receiver()
                 publishers[8] = 1;
             else if(strcmp(message, "\"weather/kragujevac\"") == 0)
                 publishers[9] = 1;
-            else if(strcmp(message, "\"weather/nice\"") == 0)
-                publishers[10] = 1;
             else if(strcmp(message, "\"trump\"") == 0)
                 publishers[2] = 1;
             else if(strcmp(message, "\"years\"") == 0)
@@ -110,14 +108,14 @@ void* Receiver()
 void* timerThread()
 {
     timer_finished = 0;
-    sleep(30); //30 seconds
+    sleep(15); //15 seconds
     timer_finished = 1;
     return 0;
 }
 
 void* Sender()
 {
-    char message[22][DEFAULT_BUFLEN];
+    char message[20][DEFAULT_BUFLEN];
        
     sprintf(message[0], "%s", "sub -t \"crypto\"");
     sprintf(message[1], "%s", "sub -t \"numbers\"");
@@ -130,10 +128,9 @@ void* Sender()
     sprintf(message[7], "%s", "sub -t \"weather/belgrade\"");
     sprintf(message[8], "%s", "sub -t \"weather/novisad\"");
     sprintf(message[9], "%s", "sub -t \"weather/kragujevac\"");
-    sprintf(message[10], "%s", "sub -t \"weather/nice\"");
     
 
-    for(int i = 0; i<11; i++)
+    for(int i = 0; i<10; i++)
     {
         publishers[i] = 0;
         printf("%s\n", message[i]);
@@ -150,9 +147,10 @@ void* Sender()
     pthread_t hTimerThread;
     pthread_create(&hTimerThread, NULL, timerThread, 0);
 
-    while(timer_finished == 0);
+    //while(timer_finished == 0);
+    pthread_join(hTimerThread, 0);
 
-    for(int i = 0; i<11; i++)
+    for(int i = 0; i<10; i++)
     {
         if(publishers[i] == 0)
         {
@@ -161,21 +159,20 @@ void* Sender()
         }
     }
     
-    sprintf(message[11], "%s", "unsub -t \"crypto\"");
-    sprintf(message[12], "%s", "unsub -t \"numbers\"");
-    sprintf(message[13], "%s", "unsub -t \"pollution/belgrade\"");
-    sprintf(message[14], "%s", "unsub -t \"pollution/novisad\"");
-    sprintf(message[15], "%s", "unsub -t \"pollution/kragujevac\"");
-    sprintf(message[16], "%s", "unsub -t \"weather/belgrade\"");
-    sprintf(message[17], "%s", "unsub -t \"weather/novisad\"");
-    sprintf(message[18], "%s", "unsub -t \"weather/kragujevac\"");
-    sprintf(message[19], "%s", "unsub -t \"weather/nice\"");
-    sprintf(message[20], "%s", "unsub -t \"trump\"");
-    sprintf(message[21], "%s", "unsub -t \"years\"");
+    sprintf(message[10], "%s", "unsub -t \"crypto\"");
+    sprintf(message[11], "%s", "unsub -t \"numbers\"");
+    sprintf(message[12], "%s", "unsub -t \"pollution/belgrade\"");
+    sprintf(message[13], "%s", "unsub -t \"pollution/novisad\"");
+    sprintf(message[14], "%s", "unsub -t \"pollution/kragujevac\"");
+    sprintf(message[15], "%s", "unsub -t \"weather/belgrade\"");
+    sprintf(message[16], "%s", "unsub -t \"weather/novisad\"");
+    sprintf(message[17], "%s", "unsub -t \"weather/kragujevac\"");
+    sprintf(message[18], "%s", "unsub -t \"trump\"");
+    sprintf(message[19], "%s", "unsub -t \"years\"");
 
     printf("\nReceived messages from all subs\n");
     
-    for(int i = 11; i<22; i++)
+    for(int i = 10; i<20; i++)
     {
         printf("%s\n", message[i]);
 
@@ -188,9 +185,10 @@ void* Sender()
         }  
     }
 
-    sleep(5);
+    sleep(10);
     continue_recv = 0;
     pthread_create(&hTimerThread, NULL, timerThread, 0);
+    pthread_join(hTimerThread, 0);
 
     if(check_recv == 1)
     {
@@ -229,10 +227,7 @@ int main(int argc , char *argv[])
     pthread_create(&hSender, NULL, Sender, 0);
     pthread_create(&hReceiver, NULL, Receiver, 0);
 
-    //pthread_join(hSender, 0);
-    //pthread_join(hReceiver, 0);
-
-    sleep(120);
+    pthread_join(hSender, 0);
 
     return 0;
 }

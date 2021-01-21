@@ -5,7 +5,7 @@ import requests
 import time
 
 url_w = 'http://api.openweathermap.org/data/2.5/weather?q={}&appid={}' #api from https://openweathermap.org/api
-api_key_w = 'YOUR API'
+api_key_w = 'YOUR API-KEY'
 def getWeather(city):
     result = requests.get(url_w.format(city, api_key_w))
     if result:
@@ -18,7 +18,7 @@ def getWeather(city):
         pressure = json['main']['pressure']
         humidity = json['main']['humidity']
 
-        ret_val = 'pub -t "weather/'+ city.lower().replace(' ', '') + '" -m "' + str(city) + ' ' + str(country) + ' ' + str( round(temp_celsius,2) ) + ' ' + str(weather) + ' '
+        ret_val = 'pub -t "weather/' + city.lower().replace(' ', '') + '" -m "' + str(city) + ' ' + str(country) + ' ' + str( round(temp_celsius,2) ) + ' ' + str(weather) + ' '
         ret_val += str(description) + ' ' + str(pressure) + ' ' + str(humidity) + '"'
 
         return ret_val  
@@ -47,7 +47,7 @@ print('Waiting for connection\n')
 clientSock, addr = sock.accept()
 
 for i in range(3):
-    cities = [getWeather('Belgrade'), getWeather('Novi Sad'), getWeather('Kragujevac'), getWeather('Nis')]
+    cities = [getWeather('Belgrade'), getWeather('Novi Sad'), getWeather('Kragujevac')]
 
     for city in cities:
         data = clientSock.recv(512)

@@ -30,7 +30,6 @@ int meniCity()
     puts("1. Novi Sad");
     puts("2. Belgrade");
     puts("3. Kragujevac");
-    puts("4. Nis");
 
     int selected;
     while(1)
@@ -38,8 +37,8 @@ int meniCity()
         printf("Choose city:\n");
         scanf("%d", &selected);
 
-        if(selected<0 || selected>4)
-            printf("Option must be in range [0,4]\n");
+        if(selected<0 || selected>3)
+            printf("Option must be in range [0,3]\n");
         else
             break;
     }
@@ -86,10 +85,6 @@ void inputCityToString(int input, char* dst)
 
         case 3:
             sprintf(dst, "%s", "kragujevac\"");
-            break;
-
-        case 4:
-            sprintf(dst, "%s", "nis\"");
             break;
 
         default:

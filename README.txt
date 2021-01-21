@@ -1,4 +1,4 @@
-Uputstvo za koriscenje
+Uputstvo za korišćenje
  - Kako prevesti
  	U folderu "src" se nalaze izvorni kod i makefile
  	U terminalu u tom folderu pokrenuti komande:
@@ -13,7 +13,7 @@ Uputstvo za koriscenje
  		./client
  	
  	Server aplikacija nema interakcije sa korisnikom, samo ispis statusa u terminal.
- 	Klijent aplikacija se koristi preko izbora u meniju, unosenjem rednog broja stavke.
+ 	Klijent aplikacija se koristi preko izbora u meniju, unošenjem rednog broja stavke.
 
     python fajlovi služe kao publisheri koji šalju informacije sa web-a
     Pokreću se sa: 

@@ -19,7 +19,7 @@ except:
     sys.exit(2)
 
 url = 'http://api.openweathermap.org/data/2.5/weather?q={}&appid={}' #api from https://openweathermap.org/api
-api_key = 'YOUR API'
+api_key = 'YOUR API-KEY'
 
 def getWeather(city):
     result = requests.get(url.format(city, api_key))
@@ -41,7 +41,7 @@ def getWeather(city):
         return 0
 
 while(1):
-    cities = [getWeather('Belgrade'), getWeather('Novi Sad'), getWeather('Kragujevac'), getWeather('Nis')]
+    cities = [getWeather('Belgrade'), getWeather('Novi Sad'), getWeather('Kragujevac')]
 
     for city in cities:
         time.sleep(2) #2 seconds
